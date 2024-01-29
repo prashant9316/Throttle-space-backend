@@ -128,7 +128,13 @@ const getAllProducts = async (req, res) => {
 const getProductBySlug = async (req, res) => {
   // console.log("slug", req.params.slug);
   try {
-    const product = await Product.findOne({ slug: req.params.slug });
+    const product = await Product.findOne({ slug: req.params.slug })
+    .populate({
+      path: "category", select: "_id name"
+    })
+    .populate({
+      path: "categories", select: "_id name"
+    });
     res.send(product);
   } catch (err) {
     res.status(500).send({
