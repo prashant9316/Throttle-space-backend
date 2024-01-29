@@ -136,26 +136,29 @@ const getProductBySlug = async (req, res) => {
     .populate({
       path: "categories", select: "_id name"
     });
-
-    const variants = product.variants;
-    const variantValues = variants.map(variant => {
-      const firstKey = Object.keys(variant)[0];
-      return variant[firstKey];
-    })
-    const firstKey = Object.keys(variants[0])[0];
-    console.log(variantValues)
-    const attributeData = await Attribute.findById(firstKey);
-    const modifiedVariants = variants.map((variant, idx) => {
-      const attributeVariant = attributeData.variants.find(v => v._id.toString() === variantValues[idx]);
-      console.log(attributeVariant)
-      return {
-        ...variant,
-        name: attributeData.name.en,
-        value: attributeVariant.name.en
-      }
-    });
-    console.log(modifiedVariants);
-    product.variants = modifiedVariants;
+    // return res.send(product)
+    if(product.variants == []){
+      const variants = product.variants;
+      const variantValues = variants.map(variant => {
+        const firstKey = Object.keys(variant)[0];
+        return variant[firstKey];
+      })
+      const firstKey = Object.keys(variants[0])[0];
+      console.log(variantValues)
+      const attributeData = await Attribute.findById(firstKey);
+      const modifiedVariants = variants.map((variant, idx) => {
+        const attributeVariant = attributeData.variants.find(v => v._id.toString() === variantValues[idx]);
+        console.log(attributeVariant)
+        return {
+          ...variant,
+          name: attributeData.name.en,
+          value: attributeVariant.name.en
+        }
+      });
+      console.log(modifiedVariants);
+      product.variants = modifiedVariants;
+    }
+    
     // console.log(product.attributeData)
     res.send(product);
   } catch (err) {
