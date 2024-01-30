@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
+const logger = require('morgan');
 
 const { connectDB } = require("../config/db");
 const productRoutes = require("../routes/productRoutes");
@@ -14,6 +15,7 @@ const couponRoutes = require("../routes/couponRoutes");
 const attributeRoutes = require("../routes/attributeRoutes");
 const settingRoutes = require("../routes/settingRoutes");
 const currencyRoutes = require("../routes/currencyRoutes");
+const homePageRoutes = require('../routes/homepageRoutes');
 const languageRoutes = require("../routes/languageRoutes");
 const { isAuth, isAdmin } = require("../config/auth");
 
@@ -28,6 +30,8 @@ app.set("trust proxy", 1);
 app.use(express.json({ limit: "4mb" }));
 app.use(helmet());
 app.use(cors());
+
+app.use(logger('dev'));
 
 //root route
 app.get("/", (req, res) => {
@@ -44,6 +48,7 @@ app.use("/api/attributes/", attributeRoutes);
 app.use("/api/setting/", settingRoutes);
 app.use("/api/currency/", isAuth, currencyRoutes);
 app.use("/api/language/", languageRoutes);
+app.use("/api/homepage/", homePageRoutes);
 
 //if you not use admin dashboard then these two route will not needed.
 app.use("/api/admin/", adminRoutes);
