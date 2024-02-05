@@ -22,11 +22,18 @@ const getNewArrivalProducts = async(req, res) => {
                 populate: {
                     path: 'product'
                 }
+            })
+            .populate({
+                path: "productRef",
+                populate: {
+                    path: 'category'
+                }
             });
         return res.status(200).json({
             products: newArrivals
         })
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             message: "Server Error Occured",
             error
