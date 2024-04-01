@@ -412,13 +412,21 @@ const addSmallBizStars = async(req, res) => {
 
 const getFoundersPick = async(req, res) => {
     try {
+        console.log("Featured products route")
         const newArrivals = await HomePage.find({sectionCode: 'FP'})
             .populate({
-                path: 'productRef',
+                path: "productRef",
                 populate: {
                     path: 'product'
                 }
+            })
+            .populate({
+                path: "productRef",
+                populate: {
+                    path: 'category'
+                }
             });
+        console.log(newArrivals)
         return res.status(200).json({
             data: newArrivals
         })

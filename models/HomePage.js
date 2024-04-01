@@ -13,7 +13,7 @@ const HomePageSchema = new mongoose.Schema(
                 'FS',  // Flash Sale
                 'RVP',  // Recently Viewed Products
                 'SBS', // Small Bizz Stars
-                'FP',  // Founders' Pick
+                'FP',  // Featured Products
                 'BS',  // Blogs Section
                 'HB'   // Homepage Banners
             ]
