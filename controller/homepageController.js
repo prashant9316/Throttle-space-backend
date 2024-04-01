@@ -65,7 +65,6 @@ const addNewArrivalsProducts = async(req, res) => {
 }
 
 
-
 const getTopSellingCategories = async(req, res) => {
     try {
         const topSellingCategories = await HomePage.find({sectionCode: 'TSC'})

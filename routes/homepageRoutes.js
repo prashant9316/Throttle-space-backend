@@ -52,7 +52,7 @@ router.get('/small-biz-stars', getSmallBizStars)
 
 router.post('/small-biz-stars', addSmallBizStars)
 
-router.get('/founders-pick', getFoundersPick)
+router.get('/featured-products', getFoundersPick)
 
 router.post('/founders-pick', addFoundersPick)
 
