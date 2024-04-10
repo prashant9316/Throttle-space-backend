@@ -22,6 +22,42 @@ const addProduct = async (req, res) => {
   }
 };
 
+
+const getProductByCategory = async(req, res) => {
+  console.log("Get Product BY Category")
+  try {
+    let category;
+    // category = await Category.find({slug: req.params.category});
+    // if(!category){
+      // console.log(`Not found by slug. Searching by name: ${req.params.category}`)
+    category = await Category.find({"name.en": req.params.category});
+    // }
+
+    // console.log(category)
+    const categoryId = category[0]._id;
+    // const category = req.params.category;
+    const products = await Product.find({ 
+      $or: [
+        {category: mongoose.Types.ObjectId(categoryId)},
+        {categories: mongoose.Types.ObjectId(categoryId)}
+      ]
+     })
+     .populate({ path: "category", select: "_id name" })
+     .populate({ path: "categories", select: "_id name" });
+  
+    // console.log(products)
+    return res.status(200).json({
+      products
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({
+      error: error.message
+    })
+  }
+}
+
+
 const addAllProducts = async (req, res) => {
   try {
     // console.log('product data',req.body)
@@ -373,4 +409,5 @@ module.exports = {
   deleteProduct,
   deleteManyProducts,
   getShowingStoreProducts,
+  getProductByCategory
 };

@@ -22,7 +22,6 @@ const customerSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-
     email: {
       type: String,
       required: true,
@@ -36,6 +35,11 @@ const customerSchema = new mongoose.Schema(
     password: {
       type: String,
       required: false,
+    },
+    guest: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   {

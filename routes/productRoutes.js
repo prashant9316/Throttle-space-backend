@@ -10,6 +10,7 @@ const {
   updateProduct,
   updateManyProducts,
   updateStatus,
+  getProductByCategory,
   deleteProduct,
   deleteManyProducts,
   getShowingStoreProducts,
@@ -35,6 +36,9 @@ router.get("/", getAllProducts);
 
 //get a product by slug
 router.get("/product/:slug", getProductBySlug);
+
+// get product for category page
+router.get('/category/:category', getProductByCategory);
 
 //update a product
 router.patch("/:id", updateProduct);

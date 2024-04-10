@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
+
 
 const categorySchema = new mongoose.Schema(
   {
@@ -8,6 +10,14 @@ const categorySchema = new mongoose.Schema(
     },
     description: {
       type: Object,
+      required: false,
+    },
+    shortDescription: {
+      type: Object,
+      required: false,
+    },
+    tagline: {
+      type: String,
       required: false,
     },
     slug: {
@@ -35,7 +45,7 @@ const categorySchema = new mongoose.Schema(
       lowercase: true,
       enum: ['show', 'hide'],
       default: 'show',
-    },
+    }
   },
   {
     timestamps: true,
@@ -43,6 +53,17 @@ const categorySchema = new mongoose.Schema(
 );
 
 // module.exports = categorySchema;
+
+
+categorySchema.pre('save', function (next) {
+  if (!this.isModified('name')) {
+    next();
+    return;
+  }
+
+  this.slug = slugify(this.name.en, { lower: true, strict: true });
+  next();
+});
 
 const Category = mongoose.model('Category', categorySchema);
 module.exports = Category;

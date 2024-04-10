@@ -7,22 +7,133 @@ const Order = require("../models/Order");
 
 const { handleProductQuantity } = require("../lib/stock-controller/others");
 const { formatAmountForStripe } = require("../lib/stripe/stripe");
+const Product = require("../models/Product");
 
 const addOrder = async (req, res) => {
   try {
+    const productsInCart = req.body.cart;
+
+    let totalPrice = 0;
+    let totalOriginalPrice = 0;
+    let totalDiscount = 0;
+    let orderCart = [];
+    
+    for (let i = 0; i<productsInCart.length; i++){
+      const productDetails = await Product.findById(productsInCart[i].id);
+      const productOriginalPrice = productDetails.prices.originalPrice * productsInCart[i].quantity;
+      const productPrice = productDetails.prices.price * productsInCart[i].quantity;
+      const productDiscount = productOriginalPrice - productPrice;
+      totalPrice += productPrice;
+      totalOriginalPrice += productOriginalPrice;
+      totalDiscount += productDiscount;
+      orderCart.push({
+        id: productsInCart[i].id,
+        quantity: productsInCart[i].quantity,
+        price: productPrice,
+        originalPrice: productOriginalPrice,
+        discount: productDiscount,
+      });
+    }
+
+    const billing = req.body.billing;
     const newOrder = new Order({
-      ...req.body,
+      cart: orderCart,
+      paymentMethod: req.body.paymentMethod,
+      subTotal: totalOriginalPrice,
+      user_info: {
+        name: `${billing.firstName} ${billing.lastName}`,
+        email: billing.email,
+        contact: billing.phone,
+        address: billing.address,
+        state: billing.state,
+        city: billing.city,
+        country: billing.country,
+        zipCode: billing.zipCode,
+      },
+      guestCheckout: req.body.guestCheckout,
+      discount: totalDiscount,
+      total: totalPrice,
       user: req.user._id,
+      confirmed: false,
+      status: "Pending",
     });
+
     const order = await newOrder.save();
-    res.status(201).send(order);
-    handleProductQuantity(order.cart);
+    res.status(201).json({
+      order,
+      message: "Order created successfully."
+    });
+    // handleProductQuantity(order.cart);
   } catch (err) {
+    console.log(err)
     res.status(500).send({
       message: err.message,
     });
   }
 };
+
+
+const addPaymentDetails = async(req, res) => {
+  // return res.status(500).json({
+  //   error: "Internal Server Error",
+  // })
+  try {
+    const order = await Order.findById(req.params.id);
+    const paymentRefId = req.body.refId;
+    order.paymentInfoDetails = {
+      payment_id: paymentRefId,
+      payment_gateway: "UPI",
+      payment_status: "Not Verified",
+      payment_response: "Under Verification"
+    }
+    const updatedOrder = await order.save();
+    return res.status(200).json({
+      message: "Payment details added successfully.",
+      order: updatedOrder
+    });
+  } catch (err) {
+    return  res.status(500).send({
+      message: err.message,
+    });
+  }
+}
+
+
+// confirm order from admin
+const confirmOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    order.confirmed = true;
+    order.status = "Processing";
+    await order.save();
+    res.status(200).json({
+      message: "Order confirmed successfully.",
+    });
+  }
+  catch (err) {
+    res.status(500).send({
+      message: err.message,
+    });
+  }
+}
+
+// confirm payment from admin
+const confirmPayment = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    order.status = "Delivered";
+    await order.save();
+    res.status(200).json({
+      message: "Payment confirmed successfully.",
+    });
+  }
+  catch (err) {
+    res.status(500).send({
+      message: err.message,
+    });
+  }
+}
+
 
 //create payment intent for stripe
 const createPaymentIntent = async (req, res) => {
@@ -185,4 +296,7 @@ module.exports = {
   getOrderById,
   getOrderCustomer,
   createPaymentIntent,
+  confirmOrder,
+  confirmPayment,
+  addPaymentDetails
 };

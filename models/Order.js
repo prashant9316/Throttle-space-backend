@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
+const shortid = require('shortid');
 
 const orderSchema = new mongoose.Schema(
   {
@@ -13,6 +14,11 @@ const orderSchema = new mongoose.Schema(
       required: false,
     },
     cart: [{}],
+    orderId: {
+      type: String,
+      required: true,
+      default: 'ORD-' + shortid.generate(),
+    },
    user_info: {
       name: {
         type: String,
@@ -50,6 +56,7 @@ const orderSchema = new mongoose.Schema(
     shippingCost: {
       type: Number,
       required: true,
+      default: 0
     },
     discount: {
       type: Number,
@@ -65,17 +72,66 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    status: {
+      type: String,
+      enum: ['Pending', 'Processing', 'Delivered', 'Cancel', 'Return'],
+    },
+    guestCheckout: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    awb: {
+      type: String,
+      required: false,
+    },
     paymentMethod: {
       type: String,
+      required: false,
+    },
+    paymentStatus: {
+      type: Boolean,
       required: true,
+      default: false,
     },
     cardInfo: {
       type: Object,
       required: false,
     },
-    status: {
-      type: String,
-      enum: ['Pending', 'Processing', 'Delivered', 'Cancel'],
+    confirmed: {
+      type: Boolean,
+      default: false,
+    },
+    shipmentDetails: {
+      length: {
+        type: String,
+        required: false,
+      },
+      height: {
+        type: String,
+        required: false,
+      },
+      breadth: {
+        type: String,
+        required: false,
+      },
+      weight: {
+        type: String,
+        required: false,
+      },
+    },
+    paymentInfoDetails: {
+      payment_id: String,
+      payment_gateway: String,
+      payment_status: String,
+      payment_response: String,
+    },
+    courierDetails: {
+      shipping_id: String,
+      awb_number: String,
+      courier_id: String,
+      courier_name: String,
+      label: String,
     },
   },
   {
