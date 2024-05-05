@@ -204,7 +204,7 @@ const changePassword = async (req, res) => {
 const signUpWithProvider = async (req, res) => {
   try {
     // const { user } = jwt.decode(req.body.params);
-    const user = jwt.decode(req.params.token);
+    const user = req.body;
 
     // console.log("user", user);
     const isAdded = await Customer.findOne({ email: user.email });
@@ -220,10 +220,12 @@ const signUpWithProvider = async (req, res) => {
         image: isAdded.image,
       });
     } else {
+      const newPassword = bcrypt.hashSync(user.password)
       const newUser = new Customer({
         name: user.name,
         email: user.email,
         image: user.picture,
+        password: newPassword,
       });
 
       const signUpCustomer = await newUser.save();
