@@ -95,7 +95,7 @@ const addAllCustomers = async (req, res) => {
 
 const loginCustomer = async (req, res) => {
   try {
-    const customer = await Customer.findOne({ email: req.body.registerEmail });
+    const customer = await Customer.findOne({ email: req.body.email });
 
     if (
       customer &&
