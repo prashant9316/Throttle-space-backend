@@ -96,7 +96,9 @@ const addAllCustomers = async (req, res) => {
 const loginCustomer = async (req, res) => {
   try {
     const customer = await Customer.findOne({ email: req.body.email });
-
+    console.log(customer)
+    console.log(req.body.password)
+    console.log("Hashed password: ", bcrypt.hashSync(req.body.password));
     if (
       customer &&
       customer.password &&
