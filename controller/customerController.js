@@ -209,16 +209,22 @@ const signUpWithProvider = async (req, res) => {
     // console.log("user", user);
     const isAdded = await Customer.findOne({ email: user.email });
     if (isAdded) {
-      const token = signInToken(isAdded);
-      res.send({
-        token,
-        _id: isAdded._id,
-        name: isAdded.name,
-        email: isAdded.email,
-        address: isAdded.address,
-        phone: isAdded.phone,
-        image: isAdded.image,
-      });
+      if(bcrypt.compareSync(user.password, isAdded.password)){
+        const token = signInToken(isAdded);
+        res.send({
+          token,
+          _id: isAdded._id,
+          name: isAdded.name,
+          email: isAdded.email,
+          address: isAdded.address,
+          phone: isAdded.phone,
+          image: isAdded.image,
+        });
+      } else {
+        res.status(401).send({
+          message: "Email already exists, please login with your email & password!",
+        });
+      }
     } else {
       const newPassword = bcrypt.hashSync(user.password)
       const newUser = new Customer({
